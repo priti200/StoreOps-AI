@@ -17,6 +17,29 @@ Built with **FastAPI**, **LangGraph**, **LangChain**, and **ChromaDB**.
 
 Users interact via a REST API:
 
+```mermaid
+graph TD
+    User[User / Client] -->|POST /query| API[FastAPI Endpoint]
+    API -->|Input| Coord[Coordinator Agent]
+    
+    subgraph Orchestration [LangGraph Orchestration]
+        Coord -->|Intent: Content/Policy| RAG[Store RAG Agent]
+        Coord -->|Intent: Inventory/Pricing| Ops[Operations Agent]
+        
+        RAG -->|Retrieve| VDB[(FAISS Vector DB)]
+        
+        Ops -->|Call Tool| T1[Inventory Tool]
+        Ops -->|Call Tool| T2[Pricing Tool]
+        
+        RAG -->|Proposed Answer| Safety[Safety Agent]
+        Ops -->|Proposed Action| Safety
+        
+        Safety -->|Review Decision| Final[Final Response]
+    end
+    
+    Final -->|JSON Response| API
+```
+
 `User Input` -> `Coordinator` -> (`StoreRAG` OR `Operations`) -> `Safety` -> `Final Response`
 
 ## 📦 Tech Stack
