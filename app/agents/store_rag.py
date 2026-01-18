@@ -2,64 +2,60 @@ import json
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain_core.documents import Document
+from app.database import SessionLocal
+from app.models import Product, Order
 
 # Load environment variables
 from dotenv import load_dotenv
 load_dotenv()
 
 class StoreRAG:
-    def __init__(self, products_path: str = "app/data/products.json", orders_path: str = "app/data/orders.json"):
-        self.products_path = products_path
-        self.orders_path = orders_path
+    def __init__(self):
         self.embedding_function = OpenAIEmbeddings(model="text-embedding-3-small")
         self.vector_store = None
         self._initialize_knowledge_base()
 
     def _initialize_knowledge_base(self):
-        """Indexes products and orders if not already indexed."""
-        # For FAISS (in-memory by default for this MVP), we rebuild on startup.
-        # In production, we would load_local().
-        
+        """Indexes products and orders from the SQL database."""
+        db = SessionLocal()
         documents = []
         
-        # Index Products
         try:
-            with open(self.products_path, "r") as f:
-                products = json.load(f)
-                for p in products:
-                    content = f"Product: {p['name']}. Category: {p['category']}. Price: ${p['price']}. Stock: {p['stock']}. Description: {p['description']}"
-                    doc = Document(page_content=content, metadata={"type": "product", "id": p['id']})
-                    documents.append(doc)
-        except FileNotFoundError:
-            print(f"Warning: {self.products_path} not found.")
+            # Index Products
+            products = db.query(Product).all()
+            for p in products:
+                content = f"Product: {p.name}. Category: {p.category}. Price: ${p.price}. Stock: {p.stock}. Description: {p.description}"
+                doc = Document(page_content=content, metadata={"type": "product", "id": p.id})
+                documents.append(doc)
 
-        # Index Orders (Summarized)
-        try:
-            with open(self.orders_path, "r") as f:
-                orders = json.load(f)
-                for o in orders:
-                    content = f"Order ID: {o['order_id']}. Product ID: {o['product_id']}. Quantity: {o['quantity']}. Date: {o['date']}. Revenue: ${o['revenue']}."
-                    doc = Document(page_content=content, metadata={"type": "order", "id": o['order_id']})
-                    documents.append(doc)
-        except FileNotFoundError:
-            print(f"Warning: {self.orders_path} not found.")
-            
-        # Index Policies (Hardcoded for MVP)
-        policies = [
-            "Return Policy: Items can be returned within 30 days of purchase if they are in original condition.",
-            "Shipping Policy: Free shipping on orders over $50. Standard shipping takes 3-5 business days.",
-            "Support Policy: Customer support is available 24/7 via email at support@examplestore.com."
-        ]
-        for policy in policies:
-            doc = Document(page_content=policy, metadata={"type": "policy"})
-            documents.append(doc)
+            # Index Orders (Summarized)
+            orders = db.query(Order).all()
+            for o in orders:
+                content = f"Order ID: {o.order_id}. Product ID: {o.product_id}. Quantity: {o.quantity}. Date: {o.date}. Revenue: ${o.revenue}."
+                doc = Document(page_content=content, metadata={"type": "order", "id": o.order_id})
+                documents.append(doc)
+                
+            # Index Policies (Hardcoded for MVP)
+            policies = [
+                "Return Policy: Items can be returned within 30 days of purchase if they are in original condition.",
+                "Shipping Policy: Free shipping on orders over $50. Standard shipping takes 3-5 business days.",
+                "Support Policy: Customer support is available 24/7 via email at support@examplestore.com."
+            ]
+            for policy in policies:
+                doc = Document(page_content=policy, metadata={"type": "policy"})
+                documents.append(doc)
 
-        if documents:
-            if self.vector_store is None:
-                self.vector_store = FAISS.from_documents(documents, self.embedding_function)
-            else:
-                self.vector_store.add_documents(documents)
-            print(f"Indexed {len(documents)} documents into Store Knowledge Base (FAISS).")
+            if documents:
+                if self.vector_store is None:
+                    self.vector_store = FAISS.from_documents(documents, self.embedding_function)
+                else:
+                    self.vector_store.add_documents(documents)
+                print(f"Indexed {len(documents)} documents into Store Knowledge Base (FAISS from SQL).")
+        
+        except Exception as e:
+            print(f"Error during indexing: {e}")
+        finally:
+            db.close()
 
     def retrieve(self, query: str, k: int = 3) -> List[Document]:
         """Retrieves relevant documents for a given query."""
