@@ -1,0 +1,47 @@
+[
+  {
+    "id": "p1",
+    "name": "Wireless Noise-Canceling Headphones",
+    "category": "Electronics",
+    "price": 299.99,
+    "stock": 15,
+    "sales_count": 120,
+    "description": "Premium wireless headphones with active noise cancellation and 30-hour battery life."
+  },
+  {
+    "id": "p2",
+    "name": "Ergonomic Office Chair",
+    "category": "Furniture",
+    "price": 199.50,
+    "stock": 3,
+    "sales_count": 45,
+    "description": "Adjustable ergonomic chair with lumbar support and breathable mesh back."
+  },
+  {
+    "id": "p3",
+    "name": "Organic Green Tea",
+    "category": "Groceries",
+    "price": 12.00,
+    "stock": 100,
+    "sales_count": 500,
+    "description": "Certified organic green tea leaves, rich in antioxidants."
+  },
+  {
+    "id": "p4",
+    "name": "Smart Watch Series 5",
+    "category": "Electronics",
+    "price": 399.00,
+    "stock": 0,
+    "sales_count": 200,
+    "description": "Advanced smartwatch with health monitoring, GPS, and water resistance."
+  },
+  {
+    "id": "p5",
+    "name": "Yoga Mat",
+    "category": "Fitness",
+    "price": 25.00,
+    "stock": 50,
+    "sales_count": 80,
+    "description": "Non-slip yoga mat made from eco-friendly materials."
+  }
+]

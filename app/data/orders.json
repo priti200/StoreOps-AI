@@ -1,0 +1,44 @@
+[
+  {
+    "order_id": "o1001",
+    "product_id": "p1",
+    "quantity": 1,
+    "date": "2023-10-01",
+    "revenue": 299.99
+  },
+  {
+    "order_id": "o1002",
+    "product_id": "p3",
+    "quantity": 2,
+    "date": "2023-10-02",
+    "revenue": 24.00
+  },
+  {
+    "order_id": "o1003",
+    "product_id": "p2",
+    "quantity": 1,
+    "date": "2023-10-02",
+    "revenue": 199.50
+  },
+  {
+    "order_id": "o1004",
+    "product_id": "p1",
+    "quantity": 1,
+    "date": "2023-10-03",
+    "revenue": 299.99
+  },
+  {
+    "order_id": "o1005",
+    "product_id": "p5",
+    "quantity": 3,
+    "date": "2023-10-03",
+    "revenue": 75.00
+  },
+  {
+    "order_id": "o1006",
+    "product_id": "p4",
+    "quantity": 1,
+    "date": "2023-10-04",
+    "revenue": 399.00
+  }
+]
